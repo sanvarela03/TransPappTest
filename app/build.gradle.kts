@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.daggerHiltAndroid)
+    alias(libs.plugins.googleServices)
 }
 
 android {
@@ -130,6 +131,10 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.accompanist.swiperefresh)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
 }
 kapt {
     correctErrorTypes = true

@@ -12,10 +12,12 @@ import com.example.transpapptest.ui.events.SignUpEvent
 import com.example.transpapptest.ui.rules.Validator
 import com.example.transpapptest.ui.states.SignUpState
 import com.example.transpapptest.domain.use_cases.auth.AuthUseCases
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
@@ -95,7 +97,9 @@ class SignUpViewModel @Inject constructor(
         printState()
 
         viewModelScope.launch {
-            authUseCases.signUp(state.toSignUpRequest("")).collect {
+            val tkn = FirebaseMessaging.getInstance().token.await()
+
+            authUseCases.signUp(state.toSignUpRequest(tkn)).collect {
                 _signUpResponse.value = it
                 when (it) {
                     is ApiResponse.Failure -> {

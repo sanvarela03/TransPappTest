@@ -3,10 +3,12 @@ package com.example.transpapptest.config.di.module
 import com.example.transpapptest.domain.repository.AddressRepository
 import com.example.transpapptest.domain.repository.AuthRepository
 import com.example.transpapptest.domain.repository.CustomerRepository
+import com.example.transpapptest.domain.repository.NotificationRepository
 import com.example.transpapptest.domain.repository.OrderRepository
 import com.example.transpapptest.domain.repository.ProducerRepository
 import com.example.transpapptest.domain.repository.ShoppingCartRepository
 import com.example.transpapptest.domain.repository.TransporterRepository
+import com.example.transpapptest.domain.repository.VehicleRepository
 import com.example.transpapptest.domain.use_cases.address.AddAddress
 import com.example.transpapptest.domain.use_cases.address.AddressUseCases
 import com.example.transpapptest.domain.use_cases.address.DeleteAddress
@@ -32,10 +34,21 @@ import com.example.transpapptest.domain.use_cases.auth.GetUserId
 import com.example.transpapptest.domain.use_cases.auth.SignIn
 import com.example.transpapptest.domain.use_cases.auth.SignOut
 import com.example.transpapptest.domain.use_cases.auth.SignUp
+import com.example.transpapptest.domain.use_cases.notifications.DeleteNotification
+import com.example.transpapptest.domain.use_cases.notifications.GetNotifications
+import com.example.transpapptest.domain.use_cases.notifications.NotificationsUseCases
+import com.example.transpapptest.domain.use_cases.notifications.SaveNotification
+import com.example.transpapptest.domain.use_cases.transporter.ClearLocalTransporter
 import com.example.transpapptest.domain.use_cases.transporter.GetAll
 import com.example.transpapptest.domain.use_cases.transporter.GetTransporter
 import com.example.transpapptest.domain.use_cases.transporter.LoadTransporter
 import com.example.transpapptest.domain.use_cases.transporter.TransporterUseCases
+import com.example.transpapptest.domain.use_cases.transporter.UpdateAvailability
+import com.example.transpapptest.domain.use_cases.transporter.UpdateLocalTransporter
+import com.example.transpapptest.domain.use_cases.vehicle.AddVehicle
+import com.example.transpapptest.domain.use_cases.vehicle.GetAllVehicles
+import com.example.transpapptest.domain.use_cases.vehicle.GetVehicle
+import com.example.transpapptest.domain.use_cases.vehicle.VehicleUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -113,7 +126,30 @@ class UseCasesModule {
         return TransporterUseCases(
             loadTransporter = LoadTransporter(repository),
             getTransporter = GetTransporter(repository),
-            getAll = GetAll(repository)
+            getAll = GetAll(repository),
+            updateAvailability = UpdateAvailability(repository),
+            updateLocalTransporter = UpdateLocalTransporter(repository),
+            clearLocalTransporter = ClearLocalTransporter(repository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideVehicleUseCases(repository: VehicleRepository): VehicleUseCases {
+        return VehicleUseCases(
+            getAllVehicles = GetAllVehicles(repository),
+            getVehicle = GetVehicle(repository),
+            addVehicle = AddVehicle(repository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationsUseCases(repository: NotificationRepository): NotificationsUseCases {
+        return NotificationsUseCases(
+            saveNotification = SaveNotification(repository),
+            getNotifications = GetNotifications(repository),
+            deleteNotification = DeleteNotification(repository)
         )
     }
 }

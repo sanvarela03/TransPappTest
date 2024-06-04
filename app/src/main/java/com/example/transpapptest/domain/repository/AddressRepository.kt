@@ -14,7 +14,6 @@ interface AddressRepository {
     suspend fun getAllAddresses(
         fetchFromRemote: Boolean
     ): Flow<ApiResponse<List<AddressEntity>>>
-
     suspend fun getAddressById(id: Long): AddressEntity?
     suspend fun getCurrentAddressId(producerId: Long): Long?
 }

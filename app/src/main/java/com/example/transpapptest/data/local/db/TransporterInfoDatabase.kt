@@ -6,6 +6,7 @@ import com.example.transpapptest.data.local.dao.AddressDao
 import com.example.transpapptest.data.local.dao.CustomerDao
 import com.example.transpapptest.data.local.dao.CustomerInfoDao
 import com.example.transpapptest.data.local.dao.DeliveryAddressDao
+import com.example.transpapptest.data.local.dao.NotificationDao
 import com.example.transpapptest.data.local.dao.OrderDao
 import com.example.transpapptest.data.local.dao.PickupAddressDao
 import com.example.transpapptest.data.local.dao.ProducerInfoDao
@@ -17,6 +18,7 @@ import com.example.transpapptest.data.local.entities.AddressEntity
 import com.example.transpapptest.data.local.entities.CustomerEntity
 import com.example.transpapptest.data.local.entities.CustomerInfoEntity
 import com.example.transpapptest.data.local.entities.DeliveryAddressEntity
+import com.example.transpapptest.data.local.entities.NotificationEntity
 import com.example.transpapptest.data.local.entities.OrderEntity
 import com.example.transpapptest.data.local.entities.PickupAddressEntity
 import com.example.transpapptest.data.local.entities.ProducerEntity
@@ -43,7 +45,8 @@ import com.example.transpapptest.data.local.entities.VehicleEntity
         ProductEntity::class,
         ShoppingCartEntity::class,
         TransporterEntity::class,
-        VehicleEntity::class
+        VehicleEntity::class,
+        NotificationEntity::class
     ],
     version = 1
 )
@@ -59,4 +62,5 @@ abstract class TransporterInfoDatabase : RoomDatabase() {
     abstract val transporterDao: TransporterDao
     abstract val transporterInfoDao: TransporterInfoDao
     abstract val vehicleDao: VehicleDao
+    abstract val notificationDao: NotificationDao
 }

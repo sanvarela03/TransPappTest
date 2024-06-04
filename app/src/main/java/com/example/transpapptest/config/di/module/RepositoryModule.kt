@@ -4,6 +4,7 @@ import com.example.transpapptest.data.local.dao.AddressDao
 import com.example.transpapptest.data.local.dao.CustomerDao
 import com.example.transpapptest.data.local.dao.CustomerInfoDao
 import com.example.transpapptest.data.local.dao.DeliveryAddressDao
+import com.example.transpapptest.data.local.dao.NotificationDao
 import com.example.transpapptest.data.local.dao.OrderDao
 import com.example.transpapptest.data.local.dao.PickupAddressDao
 import com.example.transpapptest.data.local.dao.ProducerInfoDao
@@ -15,20 +16,25 @@ import com.example.transpapptest.data.remote.api.AddressApi
 import com.example.transpapptest.data.remote.api.AuthApi
 import com.example.transpapptest.data.remote.api.CustomerApi
 import com.example.transpapptest.data.remote.api.TransporterApi
+import com.example.transpapptest.data.remote.api.VehicleApi
 import com.example.transpapptest.data.repository.AddressRepositoryImpl
 import com.example.transpapptest.data.repository.AuthRepositoryImpl
 import com.example.transpapptest.data.repository.CustomerRepositoryImpl
+import com.example.transpapptest.data.repository.NotificationRepositoryImpl
 import com.example.transpapptest.data.repository.OrderRepositoryImpl
 import com.example.transpapptest.data.repository.ProducerRepositoryImpl
 import com.example.transpapptest.data.repository.ShoppingCartRepositoryImpl
 import com.example.transpapptest.data.repository.TransporterRepositoryImpl
+import com.example.transpapptest.data.repository.VehicleRepositoryImpl
 import com.example.transpapptest.domain.repository.AddressRepository
 import com.example.transpapptest.domain.repository.AuthRepository
 import com.example.transpapptest.domain.repository.CustomerRepository
+import com.example.transpapptest.domain.repository.NotificationRepository
 import com.example.transpapptest.domain.repository.OrderRepository
 import com.example.transpapptest.domain.repository.ProducerRepository
 import com.example.transpapptest.domain.repository.ShoppingCartRepository
 import com.example.transpapptest.domain.repository.TransporterRepository
+import com.example.transpapptest.domain.repository.VehicleRepository
 import com.example.transpapptest.security.TokenManager
 import dagger.Module
 import dagger.Provides
@@ -149,4 +155,27 @@ class RepositoryModule {
         )
     }
 
+
+    @Provides
+    @Singleton
+    fun provideVehicleRepository(
+        tokenManager: TokenManager,
+        vehicleApi: VehicleApi,
+        vehicleDao: VehicleDao
+
+    ): VehicleRepository {
+        return VehicleRepositoryImpl(
+            tokenManager = tokenManager,
+            vehicleApi = vehicleApi,
+            vehicleDao = vehicleDao
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(
+        dao: NotificationDao
+    ): NotificationRepository {
+        return NotificationRepositoryImpl(dao)
+    }
 }

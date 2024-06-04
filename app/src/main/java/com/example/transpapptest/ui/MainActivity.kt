@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import com.example.transpapptest.app.CustomerApp
 import com.example.transpapptest.app.TransporterApp
 import dagger.hilt.android.AndroidEntryPoint
 

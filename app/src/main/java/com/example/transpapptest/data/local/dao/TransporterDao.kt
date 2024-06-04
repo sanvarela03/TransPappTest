@@ -20,7 +20,6 @@ interface TransporterDao {
     @Query("SELECT * FROM TransporterEntity WHERE transporterId = :transporterId")
     fun getTransporter(transporterId: Long): Flow<TransporterEntity>
 
-
     @Transaction
     @Query("SELECT * FROM TransporterEntity")
     suspend fun getAllTransporters(): List<TransporterEntity>

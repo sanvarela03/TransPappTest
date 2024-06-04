@@ -10,6 +10,7 @@ import com.example.transpapptest.data.remote.api.AddressApi
 import com.example.transpapptest.data.remote.payload.request.AddressRequest
 import com.example.transpapptest.data.remote.payload.request.UpdateAddressRequest
 import com.example.transpapptest.data.remote.payload.response.MessageResponse
+import com.example.transpapptest.data.remote.payload.response.customer.address.AddressResponse
 import com.example.transpapptest.domain.repository.AddressRepository
 import com.example.transpapptest.security.TokenManager
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -62,16 +64,16 @@ class AddressRepositoryImpl @Inject constructor(
             emit(ApiResponse.Loading)
             val userId = tokenManager.getUserId().first()
             userId?.let {
-                val customerWithAddress = transporterDao.getTransporterAndAddress(userId)
+                val transporterWithAddress = transporterDao.getTransporterAndAddress(userId)
 
-                Log.d("manzana", "customerWithAddress = $customerWithAddress")
+                Log.d("manzana", "customerWithAddress = $transporterWithAddress")
 
-                if (customerWithAddress.isNotEmpty()) {
-                    val localAddresses = customerWithAddress[0].addressList
+                if (transporterWithAddress.isNotEmpty()) {
+                    val localAddresses = transporterWithAddress[0].addressList
                     emit(ApiResponse.Success(localAddresses))
                 }
 
-                val isDbEmpty = customerWithAddress.isEmpty()
+                val isDbEmpty = transporterWithAddress.isEmpty()
 
                 val shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote
 
@@ -79,8 +81,9 @@ class AddressRepositoryImpl @Inject constructor(
                     return@flow
                 }
 
-                val remote = getRemote(it)
 
+
+                val remote = getRemote(it)
 
                 remote?.let { addresesResponse ->
                     dao.clearAddressEntity()
@@ -109,6 +112,27 @@ class AddressRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+
+    private suspend fun <T, E> FlowCollector<ApiResponse<E>>.testRemote(
+        request: T,
+        apiCall: (T) -> Response<E>
+    ) = try {
+        val res = apiCall(request)
+        if (res.isSuccessful) {
+            res.body()
+        } else {
+            null
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+        emit(ApiResponse.Failure("No se pudo cargar los datos", 400))
+        null
+    } catch (e: HttpException) {
+        e.printStackTrace()
+        emit(ApiResponse.Failure("No se pudo cargar los datos", 400))
+        null
     }
 
     private suspend fun FlowCollector<ApiResponse<List<AddressEntity>>>.getRemote(

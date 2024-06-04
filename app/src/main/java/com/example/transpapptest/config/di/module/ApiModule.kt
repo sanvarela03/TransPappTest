@@ -4,6 +4,7 @@ import com.example.transpapptest.data.remote.api.AddressApi
 import com.example.transpapptest.data.remote.api.AuthApi
 import com.example.transpapptest.data.remote.api.CustomerApi
 import com.example.transpapptest.data.remote.api.TransporterApi
+import com.example.transpapptest.data.remote.api.VehicleApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,6 +52,15 @@ class ApiModule {
         retrofit: Retrofit.Builder
     ): AddressApi {
         return retrofit.client(okHttpClient).build().create(AddressApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVehicleApi(
+        okHttpClient: OkHttpClient,
+        retrofit: Retrofit.Builder
+    ): VehicleApi {
+        return retrofit.client(okHttpClient).build().create(VehicleApi::class.java)
     }
 
 }

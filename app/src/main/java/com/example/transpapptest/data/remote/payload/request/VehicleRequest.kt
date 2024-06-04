@@ -5,6 +5,7 @@ data class VehicleRequest(
     val model: String,
     val year: String,
     val vin: String,
+    val plate: String,
     val fuelType: String,
     val fuelConsumption: Double,
     val fuelConsumptionUnit: String,

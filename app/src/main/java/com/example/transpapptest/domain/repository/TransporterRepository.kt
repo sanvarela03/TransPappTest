@@ -8,8 +8,14 @@ import com.example.transpapptest.data.remote.payload.response.transporter.Transp
 import kotlinx.coroutines.flow.Flow
 
 interface TransporterRepository {
-    fun loadTransporter(fetchFromRemote: Boolean): Flow<ApiResponse<MessageResponse>>
-    fun getTransporter(transporterId: Long): Flow<TransporterEntity>
+    fun loadTransporter(
+        transporterId: Long,
+        fetchFromRemote: Boolean
+    ): Flow<ApiResponse<TransporterInfoResponse>>
 
+    fun getTransporter(transporterId: Long): Flow<TransporterEntity>
     suspend fun getAll(): List<TransporterEntity>
+    suspend fun updateAvailability(availability: Boolean): Flow<ApiResponse<MessageResponse>>
+    suspend fun updateLocalTransporter(transporter: TransporterEntity)
+    suspend fun clearLocalTransporter()
 }

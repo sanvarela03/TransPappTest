@@ -46,12 +46,12 @@ class ViewModelModule {
 
     ): HomeViewModel {
         return HomeViewModel(
-            authUseCases,
-            customerUseCases,
-            transporterUseCases,
-            tokenManager,
-            authViewModel,
-            signInViewModel
+            authUseCases = authUseCases,
+            customerUseCases = customerUseCases,
+            transporterUseCases = transporterUseCases,
+            tokenManager = tokenManager,
+            authViewModel = authViewModel,
+            signInViewModel = signInViewModel
         )
     }
 }

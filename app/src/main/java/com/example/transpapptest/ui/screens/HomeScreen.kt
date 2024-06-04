@@ -37,50 +37,39 @@ import com.example.transpapptest.ui.components.NavigationDrawerHeader
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen() {
-    HomeDrawer(
-        homeViewModel = hiltViewModel(),
-        homeNavController = rememberNavController()
-    )
+    HomeDrawer()
 }
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HomeDrawer(
-    homeViewModel: HomeViewModel,
-    homeNavController: NavHostController
+    viewModel: HomeViewModel = hiltViewModel(),
+    homeNavController: NavHostController = rememberNavController()
 ) {
-//    val transporter = homeViewModel.transporter.collectAsState(
-//        initial = TransporterEntity(
-//            transporterId = -1L,
-//            username = "NaN",
-//            name = "NaN",
-//            lastname = "NaN",
-//            email = "NaN",
-//            currentAddressId = -1L,
-//            currentVehicleId = -1L
-//        )
-//    ).value
 
-    val transporterId = homeViewModel.userId.collectAsState(initial = -1L).value
-    Log.d("HomeViewModelInit", "transporterId = $transporterId")
+//    val transporterId = viewModel.userId.collectAsState(initial = -1L).value
+//    Log.d("HomeViewModelInit", "transporterId = $transporterId")
+//
+//    val transporter = viewModel.getTransporter(transporterId).collectAsState(initial = null).value
 
-    val transporter =
-        homeViewModel.getTransporter(transporterId).collectAsState(initial = null).value
-//    val transporter = homeViewModel.transporter.collectAsState(initial = null).value
+    val state = viewModel.state.transporterInfoResponse
 
-    Log.d("HomeViewModelInit", "transporter = $transporter")
+    Log.d("HomeViewModelInit", "transporter = $state")
     val screens by
     remember {
         mutableStateOf(
             listOf(
                 Screen.AddressListScreen.route,
                 Screen.OrderListScreen.route,
-                Screen.ProducerSearchScreen.route
+                Screen.ProducerSearchScreen.route,
+                Screen.VehicleListScreen.route,
+                Screen.NotificationsScreen.route
             )
         )
     }
@@ -92,7 +81,7 @@ private fun HomeDrawer(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(
-        isRefreshing = homeViewModel.state.isRefreshing
+        isRefreshing = viewModel.state.isRefreshing
     )
 
     val lifecycleOwner = LocalLifecycleOwner.current.lifecycle.currentState.name
@@ -110,18 +99,17 @@ private fun HomeDrawer(
                 SwipeRefresh(
                     state = swipeRefreshState,
                     onRefresh = {
-                        homeViewModel.onEvent(HomeEvent.Refresh)
+                        viewModel.onEvent(HomeEvent.Refresh)
                     }
                 ) {
                     ModalDrawerSheet {
-                        if (transporter != null) {
-                            NavigationDrawerHeader(value = transporter.email)
+                        if (state != null) {
+                            NavigationDrawerHeader(value = state.email)
                         }
                         NavigationDrawerBody(
-                            homeViewModel.navigationItemsList,
+                            viewModel.navigationItemsList,
                             navigateTo = {
                                 scope.launch { drawerState.apply { if (isClosed) open() else close() } }
-
                                 homeNavController.navigate(it) {
                                     popUpTo(it) {
                                         inclusive = true
@@ -141,7 +129,7 @@ private fun HomeDrawer(
                         toolbarTitle = stringResource(id = R.string.home),
                         signOutButtonClicked = {
                             Log.d("HomeScreen", "signOutButtonClicked !!!")
-                            homeViewModel.onEvent(
+                            viewModel.onEvent(
                                 HomeEvent.SignOutBtnClicked(
                                     local.lifecycle.coroutineScope.coroutineContext
                                 )
@@ -155,7 +143,7 @@ private fun HomeDrawer(
             },
             bottomBar = {
                 HomeBottomBar(
-                    navigationItems = homeViewModel.bottomNavigationItemsList,
+                    navigationItems = viewModel.bottomNavigationItemsList,
                     currentDestination = homeNavController.currentBackStackEntryAsState().value?.destination,
                     navigateTo = { homeNavController.navigate(it) }
                 )

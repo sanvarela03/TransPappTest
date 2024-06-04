@@ -13,6 +13,7 @@ data class TransporterInfoResponse(
     val email: String,
     val currentAddressId: Long,
     val currentVehicleId: Long,
+    val available: Boolean,
     val addressList: List<AddressResponse>,
     val vehicleList: List<VehicleResponse>,
     val orderInfoResponseList: List<OrderInfoResponse>,
@@ -24,6 +25,7 @@ data class TransporterInfoResponse(
             name = name,
             lastname = lastname,
             email = email,
+            available = available,
             currentVehicleId = currentVehicleId,
             currentAddressId = currentAddressId,
         )

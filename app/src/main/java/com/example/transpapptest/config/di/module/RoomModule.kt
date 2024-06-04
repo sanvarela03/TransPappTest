@@ -6,6 +6,7 @@ import com.example.transpapptest.data.local.dao.AddressDao
 import com.example.transpapptest.data.local.dao.CustomerDao
 import com.example.transpapptest.data.local.dao.CustomerInfoDao
 import com.example.transpapptest.data.local.dao.DeliveryAddressDao
+import com.example.transpapptest.data.local.dao.NotificationDao
 import com.example.transpapptest.data.local.dao.OrderDao
 import com.example.transpapptest.data.local.dao.PickupAddressDao
 import com.example.transpapptest.data.local.dao.ProducerInfoDao
@@ -37,6 +38,12 @@ class RoomModule {
     @Singleton
     fun provideAddressDao(db: TransporterInfoDatabase): AddressDao {
         return db.addressDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationDao(db: TransporterInfoDatabase): NotificationDao {
+        return db.notificationDao
     }
 
     @Provides

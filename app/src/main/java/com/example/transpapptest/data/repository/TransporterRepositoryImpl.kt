@@ -2,6 +2,7 @@ package com.example.transpapptest.data.repository
 
 import android.util.Log
 import com.example.transpapptest.config.common.ApiResponse
+import com.example.transpapptest.config.common.apiRequestFlow
 import com.example.transpapptest.data.local.dao.AddressDao
 import com.example.transpapptest.data.local.dao.CustomerInfoDao
 import com.example.transpapptest.data.local.dao.DeliveryAddressDao
@@ -18,11 +19,8 @@ import com.example.transpapptest.data.remote.payload.response.transporter.Transp
 import com.example.transpapptest.domain.repository.TransporterRepository
 import com.example.transpapptest.security.TokenManager
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,48 +39,46 @@ class TransporterRepositoryImpl @Inject constructor(
     private val tokenManager: TokenManager
 ) : TransporterRepository {
     override fun loadTransporter(
+        transporterId: Long,
         fetchFromRemote: Boolean
-    ): Flow<ApiResponse<MessageResponse>> = flow {
+    ): Flow<ApiResponse<TransporterInfoResponse>> = flow {
         Log.d("TransporterRepositoryImpl", "loadTransporter")
-        val id = tokenManager.getUserId().first()
 
-        id?.let { transporterId ->
-            val localTransporter = transporterDao.getLocalTransporter(transporterId)
-            val isDbEmpty = localTransporter == null
-            val shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote
+        val localTransporter: TransporterEntity? = transporterDao.getLocalTransporter(transporterId)
+        val isDbEmpty = localTransporter == null
+        val shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote
 
-            if (shouldJustLoadFromCache) {
-                Log.d("TransporterRepositoryImpl", "Datos cargados de forma local")
-                emit(ApiResponse.Success(MessageResponse("Datos cargados de forma local")))
-                return@flow
+        if (shouldJustLoadFromCache) {
+
+            emit(ApiResponse.Success(localTransporter!!.toTransporterInfoResponse()))
+            return@flow
+        }
+
+        val responseTest = apiRequestFlow { transporterApi.getTransporter(transporterId) }
+        responseTest.collect { res ->
+            when (res) {
+                ApiResponse.Waiting -> {}
+                ApiResponse.Loading -> {}
+
+                is ApiResponse.Failure -> {
+                    emit(res)
+                }
+
+                is ApiResponse.Success -> {
+                    transporterDao.insertTransporter(res.data.toTransporterEntity())
+                    addressDao.insertAllAddresses(res.data.addressList.map { it.toAddressEntity() })
+                    vehicleDao.insertAllVehicles(res.data.vehicleList.map { it.toVehicleEntity() })
+                    res.data.orderInfoResponseList.forEach { order ->
+                        orderDao.insertOrder(order.toOrderEntity())
+                        producerInfoDao.insertProducerInfo(order.toProducerInfoEntity())
+                        customerInfoDao.insertCustomerInfo(order.toCustomerInfoEntity())
+                        transporterInfoDao.insertTransporterInfo(order.toTransporterInfoEntity())
+                        deliveryAddressDao.insertDeliveryAddress(order.toDeliveryAddressEntity())
+                        pickupAddressDao.insertPickupAddress(order.toPickupAddressEntity())
+                    }
+                    emit(res)
+                }
             }
-
-            val response: TransporterInfoResponse? = getResponse(transporterId)
-
-            Log.d("JUEPUTA", "response = $response")
-
-
-            response?.let { transporterInfoResponse ->
-                transporterDao.insertTransporter(transporterInfoResponse.toTransporterEntity())
-                transporterInfoResponse.addressList.forEach { addressResponse ->
-                    addressDao.insertAddress(addressResponse.toAddressEntity())
-                }
-                transporterInfoResponse.vehicleList.forEach { vehicleResponse ->
-                    vehicleDao.insertVehicle(vehicleResponse.toVehicleEntity())
-                }
-                transporterInfoResponse.orderInfoResponseList.forEach { orderInfoResponse ->
-                    orderDao.insertOrder(orderInfoResponse.toOrderEntity())
-                    producerInfoDao.insertProducerInfo(orderInfoResponse.toProducerInfoEntity())
-                    customerInfoDao.insertCustomerInfo(orderInfoResponse.toCustomerInfoEntity())
-                    transporterInfoDao.insertTransporterInfo(orderInfoResponse.toTransporterInfoEntity())
-                    deliveryAddressDao.insertDeliveryAddress(orderInfoResponse.toDeliveryAddressEntity())
-                    pickupAddressDao.insertPickupAddress(orderInfoResponse.toPickupAddressEntity())
-                }
-
-
-            }
-            val transporters = transporterDao.getAllTransporters()
-            Log.d("JUEPUTA", "transporters = $transporters")
         }
     }
 
@@ -94,23 +90,25 @@ class TransporterRepositoryImpl @Inject constructor(
         return transporterDao.getAllTransporters()
     }
 
-    private suspend fun FlowCollector<ApiResponse<MessageResponse>>.getResponse(
-        id: Long
-    ) = try {
-        val response = transporterApi.getTransporter(id)
-        if (response.isSuccessful) {
-            emit(ApiResponse.Success(MessageResponse("Datos del transportador obtenidos con éxito")))
-            response.body()
-        } else {
-            null
+    override suspend fun updateAvailability(availability: Boolean): Flow<ApiResponse<MessageResponse>> {
+        val transporterId = tokenManager.getUserId().first()
+        return apiRequestFlow {
+            transporterApi.updateAvailability(
+                transporterId ?: -1,
+                availability
+            )
         }
-    } catch (e: IOException) {
-        e.printStackTrace()
-        emit(ApiResponse.Failure("No se pudo cargar los datos", 400))
-        null
-    } catch (e: HttpException) {
-        e.printStackTrace()
-        emit(ApiResponse.Failure("No se pudo cargar los datos", 400))
-        null
     }
+
+    override suspend fun updateLocalTransporter(transporter: TransporterEntity) {
+        transporterDao.insertTransporter(transporter)
+    }
+
+    override suspend fun clearLocalTransporter() {
+        addressDao.clearAddressEntity()
+        vehicleDao.clearVehicleEntity()
+        orderDao.clearOrderEntity()
+        transporterDao.clearTransporterEntity()
+    }
+
 }

@@ -12,8 +12,10 @@ import androidx.navigation.navArgument
 import com.example.transpapptest.ui.navigation.graphs.Graph
 import com.example.transpapptest.ui.screens.AddEditAddressScreen
 import com.example.transpapptest.ui.screens.AddEditCustomerScreen
+import com.example.transpapptest.ui.screens.AddEditVehicleScreen
 import com.example.transpapptest.ui.screens.AddressListScreen
 import com.example.transpapptest.ui.screens.EditTransporterScreen
+import com.example.transpapptest.ui.screens.NotificationsScreen
 import com.example.transpapptest.ui.screens.OrderListScreen
 import com.example.transpapptest.ui.screens.ProducerDetailScreen
 import com.example.transpapptest.ui.screens.ProducerSearchScreen
@@ -113,7 +115,39 @@ fun HomeNavigation(
             EditTransporterScreen()
         }
         composable(Screen.VehicleListScreen.route) {
-            VehicleListScreen()
+            VehicleListScreen(
+                navigateTo = {
+                    homeNavController.navigate(it) {
+                        popUpTo(it) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = Screen.AddEditVehicleScreen.route + "?vehicleId={vehicleId}",
+            arguments = listOf(
+                navArgument(name = "vehicleId") {
+                    type = NavType.LongType
+                    defaultValue = -1
+                }
+            )
+        ) {
+            AddEditVehicleScreen(
+                navigateTo = {
+                    homeNavController.navigate(it) {
+                        popUpTo(it) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.NotificationsScreen.route) {
+            NotificationsScreen()
         }
 
     }

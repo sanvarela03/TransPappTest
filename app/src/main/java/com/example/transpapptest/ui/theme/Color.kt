@@ -14,3 +14,6 @@ val Primary = Color(0xFFFF5722)
 val Secondary = Color(0xFFFF9800)
 val AccentColor = Color(0xFFFFC107)
 val TextColor = Color(0xFF1D1617)
+
+val Tomato = Color(red = 255, green = 99, blue = 71)
+val MyGreen = Color(red = 0, green = 128, blue = 0)

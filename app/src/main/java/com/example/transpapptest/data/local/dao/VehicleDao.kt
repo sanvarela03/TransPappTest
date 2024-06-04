@@ -14,12 +14,20 @@ interface VehicleDao {
     suspend fun insertVehicle(vehicleEntity: VehicleEntity)
 
     @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllVehicles(vehicleEntity: List<VehicleEntity>)
+
+    @Transaction
     @Query("SELECT * FROM VehicleEntity WHERE id = :vehicleId")
     suspend fun getVehicle(vehicleId: Long): VehicleEntity?
 
     @Transaction
     @Query("SELECT * FROM VehicleEntity")
     suspend fun getAllVehicles(): List<VehicleEntity>?
+
+    @Transaction
+    @Query("SELECT * FROM VehicleEntity WHERE transporterId = :transporterId")
+    suspend fun getAllVehicles(transporterId: Long): List<VehicleEntity>?
 
     @Transaction
     @Query("DELETE FROM VehicleEntity")

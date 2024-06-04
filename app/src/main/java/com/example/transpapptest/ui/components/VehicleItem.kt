@@ -59,7 +59,6 @@ fun VehicleItem(
                         onDeleteClick = { onEdit(vehicle.id) },
                         onEditClick = { onDelete(vehicle.id) }
                     )
-
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
@@ -72,16 +71,23 @@ fun VehicleItem(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "${vehicle.year}",
-                        fontWeight = FontWeight.Light,
-                        fontStyle = FontStyle.Italic,
+                        text = "${vehicle.plate}",
+                        fontWeight = FontWeight.Medium,
+                        fontStyle = FontStyle.Normal,
                         modifier = Modifier.padding(horizontal = 20.dp)
                     )
                 }
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = vehicle.year,
+                    fontWeight = FontWeight.Light,
+                    fontStyle = FontStyle.Italic,
+                    modifier = Modifier.padding(horizontal = 0.dp)
+                )
                 Spacer(modifier = Modifier.height(15.dp))
                 Row {
                     Text(
-                        text = "${vehicle.fuelType.uppercase()}",
+                        text = vehicle.fuelType.uppercase(),
                         modifier = Modifier.weight(1f)
                     )
                     Text(
@@ -106,6 +112,7 @@ fun VehicleItemPreview() {
             model = "Duster",
             year = "2015",
             vin = "WBAEH73434B656853",
+            plate = "STARK001",
             fuelType = "gas",
             fuelConsumption = 10.1,
             fuelConsumptionUnit = "L/100km",

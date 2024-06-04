@@ -19,4 +19,5 @@ sealed class Screen(val route: String) {
     object PendingOrdersScreen : Screen("pending_order_screen")
     object NotificationsScreen : Screen("notification_screen")
     object VehicleListScreen : Screen("vehicle_list_screen")
+    object AddEditVehicleScreen : Screen("add_edit_vehicle_screen")
 }
